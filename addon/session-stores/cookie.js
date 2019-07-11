@@ -135,12 +135,6 @@ export default BaseStore.extend({
 
   _cookies: service('cookies'),
 
-  _fastboot: computed(function() {
-    let owner = getOwner(this);
-
-    return owner && owner.lookup('service:fastboot');
-  }),
-
   _secureCookies() {
     if (this.get('_fastboot.isFastBoot')) {
       return this.get('_fastboot.request.protocol') === 'https';
@@ -160,6 +154,9 @@ export default BaseStore.extend({
 
   init() {
     this._super(...arguments);
+    let owner = getOwner(this);
+
+    this._fastboot = owner && owner.lookup('service:fastboot');
 
     let cachedExpirationTime = this._read(`${this.get('cookieName')}-expiration_time`);
     if (cachedExpirationTime) {

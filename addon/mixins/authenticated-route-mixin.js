@@ -1,7 +1,6 @@
 import { inject as service } from '@ember/service';
 import Mixin from '@ember/object/mixin';
 import { assert } from '@ember/debug';
-import { computed } from '@ember/object';
 import { getOwner } from '@ember/application';
 import Configuration from './../configuration';
 import isFastBootCPM, { isFastBoot } from '../utils/is-fastboot';
@@ -62,11 +61,6 @@ export default Mixin.create({
   */
   session: service('session'),
 
-  _router: computed(function() {
-    let owner = getOwner(this);
-    return owner.lookup('service:router') || owner.lookup('router:main');
-  }),
-
   _isFastBoot: isFastBootCPM(),
 
   /**
@@ -80,9 +74,13 @@ export default Mixin.create({
     @default 'login'
     @public
   */
-  authenticationRoute: computed(function() {
-    return Configuration.authenticationRoute;
-  }),
+  authenticationRoute: Configuration.authenticationRoute,
+
+  init() {
+    this._super(...arguments);
+    let owner = getOwner(this);
+    this._router = this._router || owner.lookup('service:router') || owner.lookup('router:main');
+  },
 
   /**
     Checks whether the session is authenticated and if it is not aborts the
